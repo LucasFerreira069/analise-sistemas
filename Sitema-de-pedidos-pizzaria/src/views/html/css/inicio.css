@@ -133,12 +133,15 @@ nav a.active {
 .slide-content {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1rem;
   height: 100%;
   display: flex;
   align-items: center;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
-.slide-text { max-width: 36rem; }
+.slide-text { max-width: min(36rem, 90vw); }
 .slide-text h1 {
   font-size: 3.5rem;
   font-weight: 700;

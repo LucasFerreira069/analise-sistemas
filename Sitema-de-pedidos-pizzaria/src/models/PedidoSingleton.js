@@ -1,8 +1,3 @@
-/* ============================================================
-   PedidoSingleton.js — padrão Singleton
-   Garante uma única instância do pedido durante a sessão
-   Camada: Models
-   ============================================================ */
 
 class PedidoSingleton {
   static instancia = null;
