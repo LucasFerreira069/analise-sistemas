@@ -1,5 +1,6 @@
-class Pedido {
+class Pedido extends EventEmitter {
   constructor() {
+    super();
     this.itens  = [];
     this.status = 'aberto';
   }
@@ -11,6 +12,8 @@ class Pedido {
     } else {
       this.itens.push(new ItemPedido(produto));
     }
+    /* Notifica todos os ouvintes que o pedido mudou */
+    this.emit('carrinho:atualizado', this);
   }
 
   removerItem(nome) {
@@ -18,10 +21,12 @@ class Pedido {
     if (index === -1) return;
     this.itens[index].decrementar();
     if (this.itens[index].quantidade <= 0) this.itens.splice(index, 1);
+    this.emit('carrinho:atualizado', this);
   }
 
   removerItemCompleto(nome) {
     this.itens = this.itens.filter(i => i.produto.nome !== nome);
+    this.emit('carrinho:atualizado', this);
   }
 
   getTotal() {

@@ -1,89 +1,79 @@
-/* ============================================================
-   PedidoController.js — recebe ações do usuário e chama os serviços
-   Camada: Controller
-   ============================================================ */
-
 class PedidoController {
 
-  constructor() {
-    this.service = new PedidoService();
+  constructor(pedidoView) {
+    this.service    = new PedidoService();
+    this.repository = new PedidoRepository();
+    this.view       = pedidoView;
+    this.observer   = new CarrinhoObserver(pedidoView);
+
+    this.pedido = this.repository.carregar();
+
+    this.pedido.on('carrinho:atualizado', (pedido) => {
+      this.observer.atualizar(pedido);
+      this.repository.salvar(pedido);
+    });
+
+    this.view.construirModal();
+    this.view.atualizarBadge(this.pedido.getQuantidadeTotal());
+
+    const cartBtn = document.querySelector('.cart-btn');
+    if (cartBtn) cartBtn.addEventListener('click', () => this.abrirCarrinho());
   }
 
   adicionarAoCarrinho(nome, preco, imagem) {
-  const produto = ProdutoFactory.criar(nome, preco, imagem);
-  pedido.adicionarItem(produto);
-  pedido.salvar();
-  updateCartUI();
-  showCartFeedback();
-}
-
-  /* Chamado pelo cart.js ao clicar em "−" */
-  removerDoCarrinho(nome) {
-    pedido.removerItem(nome);
-    pedido.salvar();
-    updateCartUI();
-    renderCartItems();
+    const produto = ProdutoFactory.criar(nome, preco, imagem);
+    this.pedido.adicionarItem(produto);
   }
 
-  /* Chamado pelo cart.js ao clicar em "🗑" */
-  removerItemCompleto(nome) {
-    pedido.removerItemCompleto(nome);
-    pedido.salvar();
-    updateCartUI();
-    renderCartItems();
+  removerItem(nome) { this.pedido.removerItem(nome); }
+  removerItemCompleto(nome) { this.pedido.removerItemCompleto(nome); }
+
+  abrirCarrinho() {
+    this.view.abrirModal();
+    this.view.renderizarItens(this.pedido.itens, this.pedido.getTotal());
   }
 
-  /* Chamado pelo checkout.js ao clicar em "Confirmar Pedido" */
+  fecharCarrinho() { this.view.fecharModal(); }
+
+  calcularTotais() {
+    return {
+      subtotal: this.pedido.getTotal(),
+      desconto: this.service.calcularDesconto(this.pedido),
+      frete:    this.service.calcularFrete(this.pedido),
+      total:    this.service.calcularTotalFinal(this.pedido)
+    };
+  }
+
+  selecionarPagamento(metodo) {
+    if (metodo === 'dinheiro')    this.service.setEstrategiaPagamento(new PagamentoDinheiro());
+    else if (metodo === 'cartao') this.service.setEstrategiaPagamento(new PagamentoCartao());
+    else                          this.service.setEstrategiaPagamento(new PagamentoPix());
+  }
+
   confirmarPedido(dadosFormulario) {
     const { nome, telefone, cep, rua, numero,
             bairro, complemento, referencia,
             obs, metodoPagamento, troco } = dadosFormulario;
 
     if (!nome || !telefone || !cep || !rua || !numero || !bairro) {
-      throw new Error('Preencha todos os campos obrigatórios.');
+      throw new Error('Preencha todos os campos obrigatorios.');
     }
 
-    if (pedido.itens.length === 0) {
-      throw new Error('O carrinho está vazio.');
-    }
-
-    if (metodoPagamento === 'dinheiro') {
-      this.service.setEstrategiaPagamento(new PagamentoDinheiro());
-    } else if (metodoPagamento === 'cartao') {
-      this.service.setEstrategiaPagamento(new PagamentoCartao());
-    } else {
-      this.service.setEstrategiaPagamento(new PagamentoPix());
-    }
-
-    const pagamento = this.service.processarPagamento(pedido, troco);
-    this.service.finalizarPedido(pedido);
+    this.selecionarPagamento(metodoPagamento);
+    const pagamento = this.service.processarPagamento(this.pedido, troco);
+    this.service.finalizarPedido(this.pedido);
 
     return {
       pagamento,
-      total:    this.service.calcularTotalFinal(pedido),
-      desconto: this.service.calcularDesconto(pedido),
-      frete:    this.service.calcularFrete(pedido)
+      total:    this.service.calcularTotalFinal(this.pedido),
+      desconto: this.service.calcularDesconto(this.pedido),
+      frete:    this.service.calcularFrete(this.pedido)
     };
   }
 
-  /* Chamado pelo checkout.js para exibir os totais */
-  calcularTotais() {
-    return {
-      subtotal: pedido.getTotal(),
-      desconto: this.service.calcularDesconto(pedido),
-      frete:    this.service.calcularFrete(pedido),
-      total:    this.service.calcularTotalFinal(pedido)
-    };
-  }
-
-  /* Chamado pelo checkout.js ao trocar forma de pagamento */
-  selecionarPagamento(metodo) {
-    if (metodo === 'dinheiro') {
-      this.service.setEstrategiaPagamento(new PagamentoDinheiro());
-    } else if (metodo === 'cartao') {
-      this.service.setEstrategiaPagamento(new PagamentoCartao());
-    } else {
-      this.service.setEstrategiaPagamento(new PagamentoPix());
-    }
+  limparPedido() {
+    PedidoSingleton.resetar();
+    this.pedido = PedidoSingleton.getInstance();
+    this.repository.limpar();
   }
 }
