@@ -1,8 +1,3 @@
-/* ============================================================
-   ProdutoFactory.js — padrão Factory
-   Centraliza a criação de objetos Produto
-   Camada: Models
-   ============================================================ */
 
 class ProdutoFactory {
 

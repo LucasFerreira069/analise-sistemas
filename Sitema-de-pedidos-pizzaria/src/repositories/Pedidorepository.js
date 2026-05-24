@@ -1,10 +1,4 @@
-/* ============================================================
-   PedidoRepository.js — salva e recupera o pedido no localStorage
-   Camada: Repository
-   ============================================================ */
-
 class PedidoRepository {
-
   constructor() {
     this.chave = 'pizzaCart';
   }
@@ -15,6 +9,8 @@ class PedidoRepository {
       nome:       item.produto.nome,
       preco:      item.produto.preco,
       imagem:     item.produto.imagem,
+      categoria:  item.produto.categoria,
+      descricao:  item.produto.descricao,
       quantidade: item.quantidade
     }));
     localStorage.setItem(this.chave, JSON.stringify(dados));
@@ -25,7 +21,7 @@ class PedidoRepository {
     const pedido = new Pedido();
     const dados  = JSON.parse(localStorage.getItem(this.chave)) || [];
     dados.forEach(d => {
-      const produto   = new Produto(d.nome, d.preco, d.imagem);
+      const produto   = ProdutoFactory.criar(d.nome, d.preco, d.imagem, d.categoria, d.descricao);
       const item      = new ItemPedido(produto);
       item.quantidade = d.quantidade;
       pedido.itens.push(item);
