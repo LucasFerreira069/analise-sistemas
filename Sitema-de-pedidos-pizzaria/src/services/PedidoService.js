@@ -1,10 +1,3 @@
-/* ============================================================
-   PedidoService.js — regras de negócio do pedido
-   Padrão Strategy: Frete, Pagamento e Desconto
-   ============================================================ */
-
-/* ── ESTRATÉGIAS DE FRETE ── */
-
 class FreteGratis {
   calcular(pedido) { return 0; }
 }
@@ -43,31 +36,17 @@ class PagamentoPix {
   }
 }
 
-/* ── ESTRATÉGIAS DE DESCONTO ── */
-
-class SemDesconto {
-  calcular(pedido) { return 0; }
-}
-
-class DescontoPorTotal {
-  calcular(pedido) {
-    const total = pedido.getTotal();
-    if (total >= 100) return total * 0.10; // 10% acima de R$100
-    return 0;
-  }
-}
-
-/* ── SERVIÇO DO PEDIDO (contexto do Strategy) ── */
+/* ── SERVIÇO DO PEDIDO ── */
 
 class PedidoService {
   constructor(
     estrategiaFrete     = new FretePorTotal(),
     estrategiaPagamento = new PagamentoPix(),
-    estrategiaDesconto  = new DescontoPorTotal()
+    descontoService     = new DescontoService()
   ) {
     this.estrategiaFrete     = estrategiaFrete;
     this.estrategiaPagamento = estrategiaPagamento;
-    this.estrategiaDesconto  = estrategiaDesconto;
+    this.descontoService     = descontoService;
   }
 
   /* ── FRETE ── */
@@ -76,11 +55,12 @@ class PedidoService {
 
   /* ── PAGAMENTO ── */
   setEstrategiaPagamento(estrategia) { this.estrategiaPagamento = estrategia; }
-  processarPagamento(pedido, troco = null) { return this.estrategiaPagamento.processar(pedido, troco); }
+  processarPagamento(pedido, troco = null) {
+    return this.estrategiaPagamento.processar(pedido, troco);
+  }
 
   /* ── DESCONTO ── */
-  setEstrategiaDesconto(estrategia) { this.estrategiaDesconto = estrategia; }
-  calcularDesconto(pedido) { return this.estrategiaDesconto.calcular(pedido); }
+  calcularDesconto(pedido) { return this.descontoService.calcular(pedido); }
 
   /* ── TOTAL FINAL ── */
   calcularTotalFinal(pedido) {
@@ -102,7 +82,41 @@ class PedidoService {
   finalizarPedido(pedido) {
     this.validarPedido(pedido);
     pedido.status = 'confirmado';
-    pedido.salvar();
     return pedido;
+  }
+}
+
+/* ── SERVIÇO DE PRODUTOS ── */
+
+class ProdutoService {
+  static filtrarPorCategoria(produtos, categoria) {
+    return produtos.filter(p => p.categoria === categoria);
+  }
+
+  static ordenarPorPreco(produtos, ordem = 'asc') {
+    return [...produtos].sort((a, b) =>
+      ordem === 'asc' ? a.preco - b.preco : b.preco - a.preco
+    );
+  }
+
+  static ordenarPorAvaliacao(produtos) {
+    return [...produtos].sort((a, b) => b.avaliacao - a.avaliacao);
+  }
+
+  static buscar(produtos, termo) {
+    return produtos.filter(p =>
+      p.nome.toLowerCase().includes(termo.toLowerCase()) ||
+      p.descricao.toLowerCase().includes(termo.toLowerCase())
+    );
+  }
+
+  static validarProduto(produto) {
+    if (!produto.nome || produto.nome.trim() === '') {
+      throw new Error('O produto deve ter um nome.');
+    }
+    if (!produto.preco || produto.preco <= 0) {
+      throw new Error('O produto deve ter um preço válido.');
+    }
+    return true;
   }
 }

@@ -1,0 +1,130 @@
+/* ============================================================
+   responsive.css — responsividade para mobile
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  /* ── HEADER ── */
+  .nav-inner {
+    flex-wrap: nowrap;
+    padding: .75rem 1rem;
+    gap: .5rem;
+    justify-content: space-between;
+  }
+  .logo { font-size: 1.1rem; }
+  .logo svg { width: 24px; height: 24px; }
+  nav { gap: .75rem; }
+  nav a { font-size: .85rem; }
+  .search-wrap { flex: none; }
+  .search-box { display: none; }
+
+  /* ── HERO ── */
+  .hero { height: 280px; overflow: hidden; }
+
+  .slide-content {
+    padding: 0 1.25rem;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .slide-text {
+    max-width: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .slide-text h1 {
+    font-size: 1.4rem;
+    line-height: 1.2;
+    margin-bottom: .5rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .slide-text p {
+    font-size: .9rem;
+    margin-bottom: 1rem;
+  }
+
+  .btn-primary { padding: .6rem 1.2rem; font-size: .9rem; }
+  .arrow-btn { display: none; }
+  .dots { bottom: 1rem; }
+
+  /* ── SECTION ── */
+  .section { padding: 1.5rem 1rem; }
+  .section-header h2,
+  .section > h2 { font-size: 1.4rem; }
+
+  /* ── CATEGORIES ── */
+  .category-card { width: 100px; height: 75px; }
+  .category-card .emoji { font-size: 1.6rem; }
+  .category-card span:last-child { font-size: .75rem; }
+
+  /* ── PRODUCTS CAROUSEL ── */
+  .product-card { width: 150px; }
+  .product-img  { height: 110px; }
+  .product-info h3 { font-size: .85rem; }
+  .price { font-size: 1rem; }
+  .btn-add { font-size: .8rem; padding: .4rem; }
+
+  /* ── CARDAPIO ── */
+  .page-title { font-size: 1.5rem; margin-bottom: 1rem; }
+  .filter-bar { gap: .4rem; margin-bottom: 1rem; }
+  .filter-btn { padding: .5rem .9rem; font-size: .8rem; }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: .75rem;
+  }
+  .menu-card__img     { height: 130px; }
+  .menu-card__body    { padding: .75rem; }
+  .menu-card__body h3 { font-size: .9rem; margin-bottom: .3rem; }
+  .menu-card__body p  { font-size: .78rem; }
+  .menu-card__price   { font-size: 1rem; }
+  .menu-card__footer  { flex-direction: column; gap: .4rem; }
+  .btn-add { width: 100%; font-size: .82rem; }
+
+  /* ── CHECKOUT ── */
+  .checkout-grid   { grid-template-columns: 1fr; }
+  .form-row        { grid-template-columns: 1fr; }
+  .form-row--3     { grid-template-columns: 1fr; }
+  .span-2          { grid-column: span 1; }
+  .payment-options { grid-template-columns: 1fr; }
+  .sticky-card     { position: static; }
+  .checkout-card   { padding: 1.25rem; }
+  .order-total-final strong { font-size: 1.5rem; }
+
+  /* ── FOOTER ── */
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .footer-inner { padding: 1.5rem 1rem; }
+
+  /* ── CART MODAL ── */
+  .cart-modal__panel { width: 100vw; }
+}
+
+@media (max-width: 480px) {
+
+  /* ── HERO ── */
+  .hero { height: 220px; }
+
+  .slide-text {
+    max-width: 85%;
+  }
+
+  .slide-text h1 {
+    font-size: 1.2rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .slide-text p { display: none; }
+
+  /* ── HEADER ── */
+  nav a { font-size: .78rem; }
+
+  /* ── PRODUCTS GRID ── */
+  .product-grid { grid-template-columns: 1fr; }
+}
